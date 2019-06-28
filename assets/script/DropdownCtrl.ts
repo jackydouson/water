@@ -6,9 +6,17 @@ class DropDownCtrl extends cc.Component{
     private conf:Array<any> = []
     private seqI:Array<number> = []
     private _curI:number = 0
+
+    private tip:cc.Label = null
     
+    @property(Boolean)
+    private loop: boolean = true
     @property(Number)
     private line: number = 50
+    @property(Number)
+    private fontsize: number = 40
+    @property(cc.Font)
+    private ttfFont:cc.Font = null;
     @property([cc.String])
     private items: string[] = []
 
@@ -26,6 +34,13 @@ class DropDownCtrl extends cc.Component{
             {scaleX:0.85,scaleY:0.75,opacity:128, anchorY:0.75},
             {scaleX:0.7, scaleY:0.5, opacity:64,  anchorY:1},
         ]
+        this.line = this.fontsize + 10
+        let n = new cc.Node('tip')
+        n.parent = this.node
+        n.position = cc.v2(100, 100)
+        this.tip = n.addComponent(cc.Label)
+        this.tip.string = ''
+        n.active = false
     }
 
     start(){
@@ -34,10 +49,20 @@ class DropDownCtrl extends cc.Component{
             let t = this.seqI[i]
             let node = new cc.Node(t.toString())
             node.setAnchorPoint(cc.v2(0.5, this.conf[i].anchorY))
-            node.addComponent(cc.Label)
+            let lb = node.addComponent(cc.Label)
+            lb.overflow = cc.Label.Overflow.NONE
+            lb.fontSize = this.fontsize
+            lb.font = this.ttfFont;
             node.y = -t * this.line
             this.root.addChild(node)
         }
+        this.show(this.items)
+    }
+
+    show(item:string[]){
+        if (!item) return
+        if (item.length == 0) return
+        this.items = item
         this.makeContent(0)
         this.makeEffect()
     }
@@ -84,10 +109,14 @@ class DropDownCtrl extends cc.Component{
     makeContent(n:number){
         for(let i = 0; i < this.seqI.length; ++i){
             let t = this.seqI[i]
-            let m = this.getIndex(n + i - 2)
+            let index = n + i - 2
+            let m = this.getIndex(index)
             let node = this.root.getChildByName(t.toString())
             let com = node.getComponent(cc.Label)
             com.string = this.items[m]
+            if (!this.loop && (index < 0 || index > this.items.length - 1)) {
+                com.string = ''
+            }
         }
     }
 
@@ -106,7 +135,11 @@ class DropDownCtrl extends cc.Component{
     onTouchMove(event: any){
         let dy = event.getDeltaY()
         dy = Math.max(-20, Math.min(20, dy))
-        this.root.y += dy
+        let temp = this.root.y
+        temp += dy
+        if (!this.loop && temp < 0) return
+        if (!this.loop && temp > this.line * (this.items.length - 1)) return
+        this.root.y = temp
         let cur = this.getLevel()
         if(cur == this._curI) return
         this.makeLocation(cur)
