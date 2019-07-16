@@ -3,12 +3,16 @@ const {ccclass, property} = cc._decorator;
 @ccclass
 class DropDownCtrl extends cc.Component{
     private root:cc.Node = null
+    private tip:cc.Label = null
     private conf:Array<any> = []
     private seqI:Array<number> = []
     private _curI:number = 0
-
-    private tip:cc.Label = null
+    private _roll:number = 0
+    private _spy:number = 0
+    private _spt:number = 0
     
+    @property(Boolean)
+    private inertia: boolean = true
     @property(Boolean)
     private loop: boolean = true
     @property(Number)
@@ -36,11 +40,11 @@ class DropDownCtrl extends cc.Component{
         ]
         this.line = this.fontsize + 10
         let n = new cc.Node('tip')
-        n.parent = this.node
-        n.position = cc.v2(100, 100)
+        n.parent = cc.find('Canvas')
+        n.position = cc.v2(0, 250)
         this.tip = n.addComponent(cc.Label)
         this.tip.string = ''
-        n.active = false
+        n.active = false 
     }
 
     start(){
@@ -129,17 +133,10 @@ class DropDownCtrl extends cc.Component{
         }
     }
 
-    onTouchStart(event: any){
-    }
-
-    onTouchMove(event: any){
-        let dy = event.getDeltaY()
-        dy = Math.max(-20, Math.min(20, dy))
-        let temp = this.root.y
-        temp += dy
-        if (!this.loop && temp < 0) return
-        if (!this.loop && temp > this.line * (this.items.length - 1)) return
-        this.root.y = temp
+    check(t:number){
+        if (!this.loop && t < 0) return
+        if (!this.loop && t > this.line * (this.items.length - 1)) return
+        this.root.y = t
         let cur = this.getLevel()
         if(cur == this._curI) return
         this.makeLocation(cur)
@@ -148,13 +145,47 @@ class DropDownCtrl extends cc.Component{
         this._curI = cur
     }
 
+    update(dt){
+        if(this._roll < 0){
+            this._roll += 1
+            this.check(this.root.y - 15)
+        }
+        else if(this._roll > 0){
+            this._roll -= 1
+            this.check(this.root.y + 15)
+        }
+    }
+
+    switch(y:number){
+        let ept = new Date().getTime()
+        let epd = y - this._spy
+        let etd = (ept - this._spt) * 0.001
+        let es = epd / etd
+        let yy = this.line * this.getLevel()
+        let mt = cc.moveTo(0.2, cc.v2(0, yy))
+        let cb = cc.callFunc(()=>{this._roll = Math.floor(es * 0.005)})
+        let func = (this.inertia && Math.abs(es) >= 1000) ? cb : mt
+        this.root.runAction(func)
+    }
+
+    onTouchStart(event: any){
+        this._spy = event.getLocation().y
+        this._spt = new Date().getTime()
+    }
+
+    onTouchMove(event: any){
+        let dy = event.getDeltaY()
+        dy = Math.max(-20, Math.min(20, dy))
+        this.check(this.root.y + dy)
+    }
+
     onTouchEnd(event: any){
-        let y = this.line * this.getLevel()
-        this.root.runAction(cc.moveTo(0.2, cc.v2(0, y)))
+        let epy = event.getLocation().y
+        this.switch(epy)
     }
 
     onTouchCancel(event: any){
-        let y = this.line * this.getLevel()
-        this.root.runAction(cc.moveTo(0.2, cc.v2(0, y)))
+        let epy = event.getLocation().y
+        this.switch(epy)
     }
 }
