@@ -7,7 +7,11 @@
   ],
   "design-resolution-height": 640,
   "design-resolution-width": 960,
-  "excluded-modules": [],
+  "excluded-modules": [
+    "Geom Utils",
+    "3D",
+    "3D Primitive"
+  ],
   "facebook": {
     "appID": "",
     "audience": {
@@ -23,13 +27,13 @@
   "group-list": [
     "default"
   ],
-  "last-module-event-record-time": 1558959433962,
+  "last-module-event-record-time": 1563158976901,
   "simulator-orientation": false,
   "simulator-resolution": {
     "height": 640,
     "width": 960
   },
-  "start-scene": "current",
-  "use-customize-simulator": false,
+  "start-scene": "45f9944d-8bfc-447d-9083-785170fab58b",
+  "use-customize-simulator": true,
   "use-project-simulator-setting": false
 }

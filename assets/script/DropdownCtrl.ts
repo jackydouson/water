@@ -149,10 +149,16 @@ class DropDownCtrl extends cc.Component{
         if(this._roll < 0){
             this._roll += 1
             this.check(this.root.y - 15)
+            if(this._roll == 0){
+                this.root.y = this.line * this.getLevel()
+            }
         }
         else if(this._roll > 0){
             this._roll -= 1
             this.check(this.root.y + 15)
+            if(this._roll == 0){
+                this.root.y = this.line * this.getLevel()
+            }
         }
     }
 

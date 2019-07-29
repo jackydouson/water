@@ -14,12 +14,12 @@
     "orientation": "portrait",
     "subContext": ""
   },
-  "encryptJs": true,
+  "encryptJs": false,
   "excludeScenes": [],
   "fb-instant-games": {},
   "includeSDKBox": false,
   "inlineSpriteFrames": true,
-  "inlineSpriteFrames_native": true,
+  "inlineSpriteFrames_native": false,
   "md5Cache": false,
   "mergeStartScene": false,
   "optimizeHotUpdate": false,
@@ -29,7 +29,7 @@
     "portrait": false,
     "upsideDown": false
   },
-  "packageName": "org.cocos2d.water",
+  "packageName": "com.sb.water",
   "qqplay": {
     "REMOTE_SERVER_ROOT": "",
     "orientation": "portrait",
